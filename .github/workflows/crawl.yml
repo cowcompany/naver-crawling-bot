@@ -1,0 +1,34 @@
+name: 자동 크롤링 실행
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 자정 (UTC) 실행 (한국 시간 오전 9시)
+  workflow_dispatch:  # 필요할 때 수동 실행 가능
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 코드 불러오기
+        uses: actions/checkout@v3
+
+      - name: Python 설치
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      - name: 의존성 설치
+        run: |
+          pip install requests
+
+      - name: 크롤링 코드 실행
+        run: python crawling_script.py
+
+      - name: 결과를 GitHub 저장소에 저장
+        run: |
+          git config --global user.name "cowcompany"
+          git config --global user.email "cowcompany1@gmail.com"
+          git add data/*.csv
+          git commit -m "자동 크롤링 데이터 저장: $(date)"
+          git push
