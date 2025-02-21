@@ -5,6 +5,9 @@ on:
     - cron: '0 0 * * *'  # 매일 자정 (UTC) 실행 (한국 시간 오전 9시)
   workflow_dispatch:  # 필요할 때 수동 실행 가능
 
+permissions:
+  contents: write  # ✅ GitHub Actions가 push 할 수 있도록 권한 추가
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -29,6 +32,8 @@ jobs:
         run: |
           git config --global user.name "cowcompany"
           git config --global user.email "cowcompany1@gmail.com"
+          git init  # ✅ 저장소 초기화 (필수)
           git add data/*.csv
           git commit -m "자동 크롤링 데이터 저장: $(date)"
-          git push
+          git branch -M main  # ✅ 브랜치가 없을 경우 main으로 변경
+          git push -u origin main
