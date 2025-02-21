@@ -28,6 +28,8 @@ jobs:
       - name: 크롤링 코드 실행
         run: python crawling_script.py
 
+        
+
       - name: 결과를 GitHub 저장소에 저장
         run: |
           git config --global user.name "cowcompany"
@@ -37,3 +39,20 @@ jobs:
           git commit -m "자동 크롤링 데이터 저장: $(date)"
           git branch -M main  # ✅ 브랜치가 없을 경우 main으로 변경
           git push -u origin main
+
+      - name: Git 설정 및 결과 저장
+        run: |
+          git config --global user.name "cowcompany"
+          git config --global user.email "cowcompany1@gmail.com"
+          git init
+          
+          # 🔹 데이터 폴더가 비어있지 않으면 push 실행
+          if [ -n "$(ls -A data/*.csv 2>/dev/null)" ]; then
+            git add data/*.csv
+            git commit -m "자동 크롤링 데이터 저장: $(date)"
+            git branch -M main
+            git remote add origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/cowcompany/naver-crawling-bot.git
+            git push -u origin main
+          else
+            echo "❌ CSV 파일이 존재하지 않아 push하지 않습니다."
+          fi
